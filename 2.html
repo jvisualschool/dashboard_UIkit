@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            width: 280px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .profile-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            position: relative;
+        }
+
+        .profile-avatar::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 20px;
+            background: #3b82f6;
+            border-radius: 2px;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 메인 콘텐츠 */
+        .main-content {
+            flex: 1;
+        }
+
+        .header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .search-bar {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 25px;
+            padding: 12px 25px;
+            width: 400px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .search-bar::placeholder {
+            color: #64748b;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-grid-bottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-grid-last {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        /* 도트 매트릭스 차트 */
+        .dot-matrix {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1e293b;
+        }
+
+        .dot.active {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* 원형 진행률 차트 */
+        .circular-progress-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+        }
+
+        .circular-progress {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .progress-circle {
+            transform: rotate(-90deg);
+        }
+
+        .progress-bg {
+            fill: none;
+            stroke: #1e293b;
+            stroke-width: 8;
+        }
+
+        .progress-fill {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .progress-40 {
+            stroke: #3b82f6;
+            stroke-dasharray: 188;
+            stroke-dashoffset: 113;
+        }
+
+        .progress-70 {
+            stroke: #06b6d4;
+            stroke-dasharray: 188;
+            stroke-dashoffset: 56;
+        }
+
+        .progress-90 {
+            stroke: #10b981;
+            stroke-dasharray: 188;
+            stroke-dashoffset: 19;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .progress-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* 바 차트 */
+        .bar-chart {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            height: 200px;
+            margin: 20px 0;
+        }
+
+        .bar {
+            width: 25px;
+            background: linear-gradient(to top, #1e293b, #3b82f6);
+            border-radius: 4px 4px 0 0;
+            margin: 0 3px;
+            position: relative;
+        }
+
+        .bar.active {
+            background: linear-gradient(to top, #3b82f6, #06b6d4);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #64748b;
+        }
+
+        /* 라인 차트 */
+        .line-chart {
+            height: 150px;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .chart-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 파이 차트 */
+        .pie-chart {
+            width: 120px;
+            height: 120px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .pie-slice {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .pie-80 {
+            background: conic-gradient(from 0deg, #3b82f6 0deg 288deg, #1e293b 288deg 360deg);
+        }
+
+        .pie-legend {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .legend-op1 {
+            background: #1e293b;
+        }
+
+        .legend-op2 {
+            background: #3b82f6;
+        }
+
+        /* 게이지 차트 */
+        .gauge-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+        }
+
+        .gauge {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .gauge-circle {
+            transform: rotate(-90deg);
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: #1e293b;
+            stroke-width: 6;
+        }
+
+        .gauge-fill {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .gauge-60 {
+            stroke: #3b82f6;
+            stroke-dasharray: 157;
+            stroke-dashoffset: 63;
+        }
+
+        .gauge-80 {
+            stroke: #06b6d4;
+            stroke-dasharray: 157;
+            stroke-dashoffset: 31;
+        }
+
+        .gauge-70 {
+            stroke: #10b981;
+            stroke-dasharray: 157;
+            stroke-dashoffset: 47;
+        }
+
+        .gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* 진행률 바 */
+        .progress-bars {
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            margin-bottom: 15px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: #1e293b;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* 애니메이션 효과 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+            }
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(59, 130, 246, 0.9);
+            }
+        }
+
+        @keyframes dotPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes barGrow {
+            from {
+                height: 0;
+            }
+
+            to {
+                height: var(--bar-height);
+            }
+        }
+
+        @keyframes progressFill {
+            from {
+                width: 0;
+            }
+
+            to {
+                width: var(--progress-width);
+            }
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* 애니메이션 적용 */
+        .sidebar {
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .main-content {
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        .card {
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .card:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .profile-avatar {
+            animation: pulse 2s infinite, float 3s ease-in-out infinite;
+        }
+
+        .dot.active {
+            animation: dotPulse 2s infinite;
+            animation-delay: calc(var(--dot-index) * 0.1s);
+        }
+
+        .bar {
+            animation: barGrow 1s ease-out;
+            animation-delay: calc(var(--bar-index) * 0.1s);
+            animation-fill-mode: both;
+        }
+
+        .progress-bar-fill {
+            animation: progressFill 1.5s ease-out;
+            animation-delay: 0.5s;
+            animation-fill-mode: both;
+        }
+
+        .nav-link {
+            transition: all 0.3s ease, transform 0.2s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateX(10px);
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        .search-bar {
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            transform: scale(1.02);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .progress-circle {
+            animation: rotate 2s linear infinite;
+        }
+
+        .gauge-circle {
+            animation: rotate 3s linear infinite reverse;
+        }
+
+        /* 반응형 */
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .dashboard-grid,
+            .dashboard-grid-bottom,
+            .dashboard-grid-last {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 사이드바 -->
+        <div class="sidebar">
+            <div class="profile-section">
+                <div class="profile-avatar">👤</div>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <span class="nav-icon">🌐</span>
+                            GENERAL
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">👥</span>
+                            CONTACTS
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">📍</span>
+                            ADDRESS
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <span class="nav-icon">🌍</span>
+                            LOCATION
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="main-content">
+            <!-- 헤더 -->
+            <div class="header">
+                <input type="text" class="search-bar" placeholder="Search...">
+            </div>
+
+            <!-- 첫 번째 행 -->
+            <div class="dashboard-grid">
+                <!-- TITLE 01 -->
+                <div class="card">
+                    <h3 class="card-title">TITLE 01</h3>
+                    <div class="dot-matrix">
+                        <div class="dot active"></div>
+                        <div class="dot"></div>
+                        <div class="dot active"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot active"></div>
+                        <div class="dot active"></div>
+                        <div class="dot active"></div>
+                        <div class="dot"></div>
+                        <div class="dot active"></div>
+                        <div class="dot active"></div>
+                        <div class="dot active"></div>
+                        <div class="dot active"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot active"></div>
+                        <div class="dot active"></div>
+                        <div class="dot active"></div>
+                        <div class="dot active"></div>
+                        <div class="dot active"></div>
+                    </div>
+                    <div class="timeline">
+                        <span>2000</span>
+                        <span>2010</span>
+                        <span>2020</span>
+                    </div>
+                    <p class="card-subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed diam nonummy
+                        nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat consectetur adipiscing
+                        elit, sed diam nonummy accumsan et iusto odio dignissim qui blandit praesent luptatum</p>
+                </div>
+
+                <!-- TITLE 02 -->
+                <div class="card">
+                    <h3 class="card-title">TITLE 02</h3>
+                    <div class="circular-progress-container">
+                        <div class="circular-progress">
+                            <svg class="progress-circle" width="80" height="80">
+                                <circle class="progress-bg" cx="40" cy="40" r="30"></circle>
+                                <circle class="progress-fill progress-40" cx="40" cy="40" r="30"></circle>
+                            </svg>
+                            <div class="progress-text">40%</div>
+                            <div class="progress-label">OP1</div>
+                        </div>
+                        <div class="circular-progress">
+                            <svg class="progress-circle" width="80" height="80">
+                                <circle class="progress-bg" cx="40" cy="40" r="30"></circle>
+                                <circle class="progress-fill progress-70" cx="40" cy="40" r="30"></circle>
+                            </svg>
+                            <div class="progress-text">70%</div>
+                            <div class="progress-label">OP2</div>
+                        </div>
+                        <div class="circular-progress">
+                            <svg class="progress-circle" width="80" height="80">
+                                <circle class="progress-bg" cx="40" cy="40" r="30"></circle>
+                                <circle class="progress-fill progress-90" cx="40" cy="40" r="30"></circle>
+                            </svg>
+                            <div class="progress-text">90%</div>
+                            <div class="progress-label">OP3</div>
+                        </div>
+                    </div>
+                    <p class="card-subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed diam nonummy
+                        nibh euismod tincidunt ut laoreet</p>
+                </div>
+            </div>
+
+            <!-- 두 번째 행 -->
+            <div class="dashboard-grid-bottom">
+                <!-- TITLE 03 -->
+                <div class="card">
+                    <h3 class="card-title">TITLE 03</h3>
+                    <div class="bar-chart">
+                        <div class="bar" style="height: 60px;"></div>
+                        <div class="bar active" style="height: 120px;"></div>
+                        <div class="bar active" style="height: 100px;"></div>
+                        <div class="bar" style="height: 80px;"></div>
+                        <div class="bar active" style="height: 110px;"></div>
+                        <div class="bar active" style="height: 130px;"></div>
+                    </div>
+                    <div class="timeline">
+                        <span>2000</span>
+                        <span>2010</span>
+                        <span>2020</span>
+                        <span>2030</span>
+                        <span>2040</span>
+                        <span>2050</span>
+                    </div>
+                    <p class="card-subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed diam nonummy
+                        nibh euismod tincidunt ut laoreet</p>
+                </div>
+
+                <!-- TITLE 04 -->
+                <div class="card">
+                    <h3 class="card-title">TITLE 04</h3>
+                    <div class="line-chart">
+                        <svg width="100%" height="100%">
+                            <polyline points="0,100 50,80 100,60 150,90 200,70 250,50 300,80" fill="none"
+                                stroke="#3b82f6" stroke-width="2" />
+                            <polyline points="0,120 50,100 100,85 150,110 200,95 250,75 300,105" fill="none"
+                                stroke="#06b6d4" stroke-width="2" />
+                        </svg>
+                    </div>
+                    <div class="timeline">
+                        <span>2000</span>
+                        <span>2010</span>
+                        <span>2020</span>
+                        <span>2030</span>
+                        <span>2040</span>
+                        <span>2050</span>
+                        <span>2060</span>
+                    </div>
+                </div>
+
+                <!-- TITLE 05 -->
+                <div class="card">
+                    <h3 class="card-title">TITLE 05</h3>
+                    <div class="pie-chart">
+                        <div class="pie-slice pie-80"></div>
+                    </div>
+                    <div class="pie-legend">
+                        <div class="legend-item">
+                            <div class="legend-color legend-op1"></div>
+                            <span>20%</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color legend-op2"></div>
+                            <span>80%</span>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <div class="legend-item" style="justify-content: center;">
+                            <div class="legend-color legend-op1"></div>
+                            <span>OP1</span>
+                        </div>
+                        <div class="legend-item" style="justify-content: center;">
+                            <div class="legend-color legend-op2"></div>
+                            <span>OP2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 세 번째 행 -->
+            <div class="dashboard-grid-last">
+                <!-- TITLE 06 -->
+                <div class="card">
+                    <h3 class="card-title">TITLE 06</h3>
+                    <div class="progress-bars">
+                        <div class="progress-bar">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 60%;"></div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 80%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gauge-container">
+                        <div class="gauge">
+                            <svg class="gauge-circle" width="80" height="80">
+                                <circle class="gauge-bg" cx="40" cy="40" r="25"></circle>
+                                <circle class="gauge-fill gauge-60" cx="40" cy="40" r="25"></circle>
+                            </svg>
+                            <div class="gauge-text">60%</div>
+                        </div>
+                        <div class="gauge">
+                            <svg class="gauge-circle" width="80" height="80">
+                                <circle class="gauge-bg" cx="40" cy="40" r="25"></circle>
+                                <circle class="gauge-fill gauge-80" cx="40" cy="40" r="25"></circle>
+                            </svg>
+                            <div class="gauge-text">80%</div>
+                        </div>
+                        <div class="gauge">
+                            <svg class="gauge-circle" width="80" height="80">
+                                <circle class="gauge-bg" cx="40" cy="40" r="25"></circle>
+                                <circle class="gauge-fill gauge-70" cx="40" cy="40" r="25"></circle>
+                            </svg>
+                            <div class="gauge-text">70%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 25px;">
+                    <!-- 빈 공간 또는 추가 위젯 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 페이지 로드 시 애니메이션 초기화
+        document.addEventListener('DOMContentLoaded', function () {
+            // 도트 매트릭스 애니메이션
+            const dots = document.querySelectorAll('.dot.active');
+            dots.forEach((dot, index) => {
+                dot.style.setProperty('--dot-index', index);
+                dot.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // 바 차트 애니메이션
+            const bars = document.querySelectorAll('.bar');
+            bars.forEach((bar, index) => {
+                const height = bar.style.height;
+                bar.style.setProperty('--bar-height', height);
+                bar.style.setProperty('--bar-index', index);
+                bar.style.height = '0';
+
+                setTimeout(() => {
+                    bar.style.height = height;
+                }, index * 100 + 500);
+            });
+
+            // 진행률 바 애니메이션
+            const progressBars = document.querySelectorAll('.progress-bar-fill');
+            progressBars.forEach((bar, index) => {
+                const width = bar.style.width;
+                bar.style.setProperty('--progress-width', width);
+                bar.style.width = '0';
+
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, index * 200 + 1000);
+            });
+
+            // 원형 진행률 애니메이션
+            const circularProgress = document.querySelectorAll('.progress-fill');
+            circularProgress.forEach((circle, index) => {
+                const originalOffset = circle.style.strokeDashoffset ||
+                    getComputedStyle(circle).strokeDashoffset;
+                circle.style.strokeDashoffset = '188';
+
+                setTimeout(() => {
+                    circle.style.strokeDashoffset = originalOffset;
+                }, index * 300 + 800);
+            });
+
+            // 게이지 애니메이션
+            const gauges = document.querySelectorAll('.gauge-fill');
+            gauges.forEach((gauge, index) => {
+                const originalOffset = gauge.style.strokeDashoffset ||
+                    getComputedStyle(gauge).strokeDashoffset;
+                gauge.style.strokeDashoffset = '157';
+
+                setTimeout(() => {
+                    gauge.style.strokeDashoffset = originalOffset;
+                }, index * 400 + 1200);
+            });
+
+            // 네비게이션 메뉴 호버 효과
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateX(10px) scale(1.02)';
+                });
+
+                link.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateX(0) scale(1)';
+                });
+            });
+
+            // 카드 호버 효과 강화
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                    this.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4)';
+                });
+
+                card.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0) scale(1)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+
+            // 검색바 포커스 효과
+            const searchBar = document.querySelector('.search-bar');
+            searchBar.addEventListener('focus', function () {
+                this.style.transform = 'scale(1.05)';
+                this.style.boxShadow = '0 0 30px rgba(59, 130, 246, 0.5)';
+            });
+
+            searchBar.addEventListener('blur', function () {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = 'none';
+            });
+
+            // 프로필 아바타 클릭 효과
+            const profileAvatar = document.querySelector('.profile-avatar');
+            profileAvatar.addEventListener('click', function () {
+                this.style.animation = 'none';
+                setTimeout(() => {
+                    this.style.animation = 'pulse 2s infinite, float 3s ease-in-out infinite';
+                }, 10);
+
+                // 임시 회전 효과
+                this.style.transform = 'rotate(360deg) scale(1.1)';
+                setTimeout(() => {
+                    this.style.transform = 'rotate(0deg) scale(1)';
+                }, 500);
+            });
+
+            // 라인 차트 애니메이션
+            const lineChartLines = document.querySelectorAll('.line-chart polyline');
+            lineChartLines.forEach((line, index) => {
+                const length = line.getTotalLength();
+                line.style.strokeDasharray = length;
+                line.style.strokeDashoffset = length;
+
+                setTimeout(() => {
+                    line.style.strokeDashoffset = 0;
+                    line.style.transition = 'stroke-dashoffset 2s ease-in-out';
+                }, index * 500 + 1500);
+            });
+
+            // 스크롤 시 카드 애니메이션
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // 모든 카드에 옵저버 적용
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+
+            // 파이 차트 회전 애니메이션
+            const pieChart = document.querySelector('.pie-chart');
+            if (pieChart) {
+                pieChart.addEventListener('mouseenter', function () {
+                    this.style.transform = 'rotate(180deg) scale(1.1)';
+                    this.style.transition = 'transform 0.5s ease';
+                });
+
+                pieChart.addEventListener('mouseleave', function () {
+                    this.style.transform = 'rotate(0deg) scale(1)';
+                });
+            }
+        });
+
+        // 실시간 데이터 업데이트 시뮬레이션
+        setInterval(() => {
+            // 도트 매트릭스 랜덤 업데이트
+            const dots = document.querySelectorAll('.dot');
+            const randomDot = dots[Math.floor(Math.random() * dots.length)];
+            randomDot.classList.toggle('active');
+
+            // 바 차트 높이 랜덤 변경
+            const bars = document.querySelectorAll('.bar');
+            const randomBar = bars[Math.floor(Math.random() * bars.length)];
+            const newHeight = Math.floor(Math.random() * 150) + 50;
+            randomBar.style.height = `${newHeight}px`;
+            randomBar.style.transition = 'height 0.5s ease';
+        }, 3000);
+    </script>
+</body>
+
+</html>

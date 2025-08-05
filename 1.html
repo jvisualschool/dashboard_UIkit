@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DealDeck Sales Report Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .sidebar {
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        .main-content {
+            background: #f8fafc;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .gradient-blue {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .gradient-green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        .gradient-red {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+        }
+        .gradient-purple {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        .menu-item {
+            transition: all 0.3s ease;
+        }
+        .menu-item:hover {
+            background: #f3f4f6;
+            transform: translateX(4px);
+        }
+        .menu-item.active {
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+        }
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .donut-chart {
+            height: 200px;
+        }
+        .country-flag {
+            width: 20px;
+            height: 15px;
+            border-radius: 2px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .flag-us { background: linear-gradient(to bottom, #FF0000 0%, #FF0000 50%, #FFFFFF 50%, #FFFFFF 100%); }
+        .flag-de { background: linear-gradient(to bottom, #000000 0%, #000000 33%, #FF0000 33%, #FF0000 66%, #FFFF00 66%); }
+        .flag-au { background: linear-gradient(135deg, #0052CC 0%, #FF6600 100%); }
+        .flag-fr { background: linear-gradient(to right, #0052CC 0%, #0052CC 33%, #FFFFFF 33%, #FFFFFF 66%, #FF0000 66%); }
+    </style>
+</head>
+<body>
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 p-6">
+            <div class="flex items-center mb-8">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                    <span class="text-white font-bold text-lg">D</span>
+                </div>
+                <span class="font-bold text-xl text-gray-800">DealDeck</span>
+            </div>
+            
+            <nav class="space-y-2">
+                <div class="text-gray-500 text-sm font-medium mb-4">MENU</div>
+                <a href="#" class="menu-item flex items-center px-4 py-3 text-gray-600">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    Dashboard
+                </a>
+                <a href="#" class="menu-item active flex items-center px-4 py-3">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    Report
+                </a>
+                <a href="#" class="menu-item flex items-center px-4 py-3 text-gray-600">
+                    <i class="fas fa-box mr-3"></i>
+                    Products
+                </a>
+                <a href="#" class="menu-item flex items-center px-4 py-3 text-gray-600">
+                    <i class="fas fa-users mr-3"></i>
+                    Consumer
+                </a>
+                
+                <div class="text-gray-500 text-sm font-medium mb-4 mt-8">FINANCIAL</div>
+                <a href="#" class="menu-item flex items-center px-4 py-3 text-gray-600">
+                    <i class="fas fa-exchange-alt mr-3"></i>
+                    Transactions
+                </a>
+                <a href="#" class="menu-item flex items-center px-4 py-3 text-gray-600">
+                    <i class="fas fa-file-invoice mr-3"></i>
+                    Invoices
+                </a>
+                
+                <div class="text-gray-500 text-sm font-medium mb-4 mt-8">TOOLS</div>
+                <a href="#" class="menu-item flex items-center px-4 py-3 text-gray-600">
+                    <i class="fas fa-cog mr-3"></i>
+                    Settings
+                </a>
+                <a href="#" class="menu-item flex items-center px-4 py-3 text-gray-600">
+                    <i class="fas fa-comment mr-3"></i>
+                    Feedback
+                </a>
+                <a href="#" class="menu-item flex items-center px-4 py-3 text-gray-600">
+                    <i class="fas fa-question-circle mr-3"></i>
+                    Help
+                </a>
+            </nav>
+            
+            <div class="mt-8 bg-gray-900 text-white p-6 rounded-xl">
+                <h3 class="font-bold text-lg mb-2">Upgrade Pro</h3>
+                <p class="text-gray-300 text-sm mb-4">Discover the benefits of an upgraded account</p>
+                <button class="gradient-blue text-white px-6 py-2 rounded-lg font-medium w-full">
+                    Upgrade $30
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 main-content">
+            <!-- Header -->
+            <header class="bg-white p-6 flex justify-between items-center shadow-sm">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Sales Report</h1>
+                    <p class="text-gray-500">Friday, December 15th 2023</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-search text-gray-400 text-lg"></i>
+                    <i class="fas fa-bell text-gray-400 text-lg"></i>
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-purple-400 rounded-full mr-3"></div>
+                        <div>
+                            <div class="font-medium text-gray-800">Ferra Alexandra</div>
+                            <div class="text-sm text-gray-500">Admin store</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Dashboard Content -->
+            <div class="p-6">
+                <!-- Top Stats Row -->
+                <div class="grid grid-cols-4 gap-6 mb-8">
+                    <div class="card stat-card gradient-blue text-white p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <i class="fas fa-chart-line text-2xl opacity-80"></i>
+                            <span class="bg-green-400 text-green-800 px-2 py-1 rounded text-sm font-medium">+2.08%</span>
+                        </div>
+                        <div class="text-sm opacity-80 mb-1">Total Sales</div>
+                        <div class="text-3xl font-bold">$612,917</div>
+                        <div class="text-sm opacity-80">Products vs last month</div>
+                    </div>
+                    
+                    <div class="card stat-card p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <i class="fas fa-shopping-cart text-2xl text-gray-400"></i>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-medium">+12.4%</span>
+                        </div>
+                        <div class="text-sm text-gray-500 mb-1">Total Orders</div>
+                        <div class="text-3xl font-bold text-gray-800">34,760</div>
+                        <div class="text-sm text-gray-500">Orders vs last month</div>
+                    </div>
+                    
+                    <div class="card stat-card p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <i class="fas fa-eye text-2xl text-gray-400"></i>
+                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-medium">-2.08%</span>
+                        </div>
+                        <div class="text-sm text-gray-500 mb-1">Visitor</div>
+                        <div class="text-3xl font-bold text-gray-800">14,987</div>
+                        <div class="text-sm text-gray-500">Users vs last month</div>
+                    </div>
+                    
+                    <div class="card stat-card p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <i class="fas fa-box text-2xl text-gray-400"></i>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-medium">+12.1%</span>
+                        </div>
+                        <div class="text-sm text-gray-500 mb-1">Total Sold Products</div>
+                        <div class="text-3xl font-bold text-gray-800">12,987</div>
+                        <div class="text-sm text-gray-500">Products vs last month</div>
+                    </div>
+                </div>
+                
+                <!-- Charts Row -->
+                <div class="grid grid-cols-3 gap-6 mb-8">
+                    <!-- Product Statistic -->
+                    <div class="card p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-gray-800">Product Statistic</h3>
+                            <select class="text-sm border border-gray-200 rounded px-3 py-1">
+                                <option>Today</option>
+                            </select>
+                        </div>
+                        <div class="text-sm text-gray-500 mb-4">Track your product sales</div>
+                        
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="donut-chart relative">
+                                <canvas id="productChart" width="150" height="150"></canvas>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-gray-800">9,829</div>
+                                <div class="text-sm text-gray-500">Products Sold</div>
+                                <div class="text-green-600 text-sm font-medium">+5.34%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-tv text-blue-500 mr-2"></i>
+                                    <span class="text-sm text-gray-600">Electronic</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-medium">2,487</div>
+                                    <div class="text-green-600 text-sm">+1.8%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-gamepad text-purple-500 mr-2"></i>
+                                    <span class="text-sm text-gray-600">Games</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-medium">1,828</div>
+                                    <div class="text-green-600 text-sm">+3.5%</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-couch text-orange-500 mr-2"></i>
+                                    <span class="text-sm text-gray-600">Furniture</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-medium">1,463</div>
+                                    <div class="text-red-600 text-sm">-1.0%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Customer Habbits -->
+                    <div class="card p-6 col-span-2">
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Customer Habbits</h3>
+                                <p class="text-sm text-gray-500">Track your customer habbits</p>
+                            </div>
+                            <select class="text-sm border border-gray-200 rounded px-3 py-1">
+                                <option>This year</option>
+                            </select>
+                        </div>
+                        
+                        <div class="chart-container mb-4">
+                            <canvas id="habitsChart"></canvas>
+                        </div>
+                        
+                        <div class="flex justify-center space-x-6">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 bg-gray-300 rounded-full mr-2"></div>
+                                <span class="text-sm text-gray-600">Seen product</span>
+                            </div>
+                            <div class="flex items-center bg-gray-800 text-white px-4 py-2 rounded-full">
+                                <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                                <span class="text-sm">43,787 Products</span>
+                            </div>
+                            <div class="flex items-center bg-gray-800 text-white px-4 py-2 rounded-full">
+                                <div class="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
+                                <span class="text-sm">39,784 Products</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Customer Growth -->
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">Customer Growth</h3>
+                            <p class="text-sm text-gray-500">Track customer by locations</p>
+                        </div>
+                        <select class="text-sm border border-gray-200 rounded px-3 py-1">
+                            <option>Today</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="donut-chart relative">
+                                <canvas id="growthChart" width="300" height="300"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 pl-8 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="country-flag flag-us"></div>
+                                    <span class="text-sm text-gray-600">United States</span>
+                                </div>
+                                <div class="font-bold text-gray-800">2,417</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="country-flag flag-de"></div>
+                                    <span class="text-sm text-gray-600">Germany</span>
+                                </div>
+                                <div class="font-bold text-gray-800">287</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="country-flag flag-au"></div>
+                                    <span class="text-sm text-gray-600">Australia</span>
+                                </div>
+                                <div class="font-bold text-gray-800">2,281</div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="country-flag flag-fr"></div>
+                                    <span class="text-sm text-gray-600">France</span>
+                                </div>
+                                <div class="font-bold text-gray-800">812</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Product Statistics Donut Chart
+        const productCtx = document.getElementById('productChart').getContext('2d');
+        new Chart(productCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Electronic', 'Games', 'Furniture', 'Others'],
+                datasets: [{
+                    data: [2487, 1828, 1463, 4051],
+                    backgroundColor: ['#667eea', '#764ba2', '#ff6b35', '#e5e7eb'],
+                    borderWidth: 0,
+                    cutout: '70%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        
+        // Customer Habits Bar Chart
+        const habitsCtx = document.getElementById('habitsChart').getContext('2d');
+        new Chart(habitsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                datasets: [{
+                    label: 'Seen product',
+                    data: [40000, 50000, 30000, 45000, 35000, 40000, 35000],
+                    backgroundColor: '#e5e7eb',
+                    borderRadius: 8,
+                    barThickness: 20
+                }, {
+                    label: 'Sales',
+                    data: [35000, 45000, 25000, 50000, 20000, 35000, 30000],
+                    backgroundColor: '#667eea',
+                    borderRadius: 8,
+                    barThickness: 20
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value/1000 + 'K';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Customer Growth Donut Chart
+        const growthCtx = document.getElementById('growthChart').getContext('2d');
+        new Chart(growthCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['United States', 'Australia', 'Germany', 'France'],
+                datasets: [{
+                    data: [2417, 2281, 287, 812],
+                    backgroundColor: ['#667eea', '#a8edea', '#fed6e3', '#ff6b35'],
+                    borderWidth: 0,
+                    cutout: '60%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDlBG7SkPHKfWk6q%2BElSSeG1QwLPz9UAktki2oQ1YHngNKO5TCTj9vUhvMmyfCpvIDD%2FADz3AsCXVKpAGU9CEmDY%2FlXSwyU9W%2BG4xHv21%2FokZr4K0MqUW5a8oahTP8yTYc%2FAuINu0dZdj9ybDbCP%2B5dM0ictiI1gqHl5931m%2BjgYfTZIVH2uhd952C5n8wvx9u4nijoUuieWLRC%2FGQQIv4hb8VYbx46CqJPm9otidziNnesYvGDUfAWtuXweDYJ1JGxmfzJkDeq1vNS0PAPKWA%2FD8UmyPZaWOwWAPI1HAznuMAmU5C2OVV%2FL3ymjTfEmIZlYYIxatw1CJ4rkI5oTfbc%2B%2BbNaFZt7c6i6JxUgf3vw0w6JKGzTI6CsWyUjWnPE9rv41xoq7LQXvQwGdsOKFGGU5uiNUUHgE%2Fm%2BzslHoUtl7kYvwXq%2BLm4RZD5O%2BNl5x9lzk7d%2Buwb1YVXOhrD83IL4MvXCf%2FYFsYCx8Mxg2tffeQLPDDy9aCcsqYmmIoS4kyg%3D%3D";
+        window.__genspark_locale = "ko-KR";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDlBG7SkPHKfWk6q+ElSSeG1QwLPz9UAktki2oQ1YHngNKO5TCTj9vUhvMmyfCpvIDD/ADz3AsCXVKpAGU9CEmDY/lXSwyU9W+G4xHv21/okZr4K0MqUW5a8oahTP8yTYc/AuINu0dZdj9ybDbCP+5dM0ictiI1gqHl5931m+jgYfTZIVH2uhd952C5n8wvx9u4nijoUuieWLRC/GQQIv4hb8VYbx46CqJPm9otidziNnesYvGDUfAWtuXweDYJ1JGxmfzJkDeq1vNS0PAPKWA/D8UmyPZaWOwWAPI1HAznuMAmU5C2OVV/L3ymjTfEmIZlYYIxatw1CJ4rkI5oTfbc++bNaFZt7c6i6JxUgf3vw0w6JKGzTI6CsWyUjWnPE9rv41xoq7LQXvQwGdsOKFGGU5uiNUUHgE/m+zslHoUtl7kYvwXq+Lm4RZD5O+Nl5x9lzk7d+uwb1YVXOhrD83IL4MvXCf/YFsYCx8Mxg2tffeQLPDDy9aCcsqYmmIoS4kyg==";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
